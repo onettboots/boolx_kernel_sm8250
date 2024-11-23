@@ -26,7 +26,7 @@ export CC=$HOME/toolchains/boolx-clang/bin/clang
 CLANG_DIR="$HOME/toolchains/boolx-clang"
 CLANG="${CLANG_DIR}/bin:$PATH"
 CLANG_BIN="${CLANG}/bin/"
-TARGET_IMAGE="Image.gz-dtb"
+TARGET_IMAGE="Image.gz"
 cpus=`expr $(nproc --all)`
 objdir="${kernel_dir}/out"
 CONFIGS="alioth_defconfig"
@@ -41,7 +41,7 @@ AK_VER="$BASE_AK_VER$VER"
 ZIP_NAME="$AK_VER"-"$DATE"
 TOOLCHAINS=$HOME/toolchains/boolx-clang
 CONFIG=out/.config
-KERNEL=out/arch/arm64/boot/Image.gz-dtb
+KERNEL=out/arch/arm64/boot/Image.gz
 DTBO=out/arch/arm64/boot/dtbo.img
 
 #functions

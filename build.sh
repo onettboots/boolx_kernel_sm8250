@@ -26,7 +26,7 @@ export CC=$HOME/toolchains/boolx-clang/bin/clang
 CLANG_DIR="$HOME/toolchains/boolx-clang"
 CLANG="${CLANG_DIR}/bin:$PATH"
 CLANG_BIN="${CLANG}/bin/"
-TARGET_IMAGE="Image.gz-dtb"
+TARGET_IMAGE="Image.gz"
 cpus=`expr $(nproc --all)`
 objdir="${kernel_dir}/out"
 CONFIGS="alioth_defconfig"
@@ -41,15 +41,13 @@ AK_VER="$BASE_AK_VER$VER"
 ZIP_NAME="$AK_VER"-"$DATE"
 TOOLCHAINS=$HOME/toolchains/boolx-clang
 CONFIG=out/.config
-KERNEL=out/arch/arm64/boot/Image.gz-dtb
+KERNEL=out/arch/arm64/boot/Image.gz
 DTBO=out/arch/arm64/boot/dtbo.img
-
+DTB=out/arch/arm64/boot/dtb
 #functions
 function makeconfig() {
                 PATH=${CLANG_BIN}:${PATH} \
                 make -s -j${cpus} \
-                LLVM=1 \
-                LLVM_IAS=1 \
                 CC="ccache clang" \
                 CROSS_COMPILE="aarch64-linux-gnu-" \
                 CROSS_COMPILE_ARM32="arm-linux-gnueabi-" \
@@ -59,15 +57,15 @@ function makeconfig() {
 function build() {
 		PATH=${CLANG_BIN}:${PATH} \
 		make -s -j${cpus} \
-		LLVM=1 \
-		LLVM_IAS=1 \
+		OBJDUMP=llvm-objdump \
+		STRIP=llvm-strip \
 		CC="ccache clang" \
 		CROSS_COMPILE="aarch64-linux-gnu-" \
-		CROSS_COMPILE_ARM32="arm-linux-gnueabi-" \
 		O="${objdir}" ${1} \
 		KBUILD_BUILD_USER="Onett" \
 		KBUILD_BUILD_HOST="Boots" \
-		dtbo.img
+		dtbo.img \
+		dtb
 }
 
 function create_out {
@@ -88,7 +86,7 @@ function make_config {
 		makeconfig ${CONFIGS}
 }
 function make_boot {
-		cp $KERNEL $REPACK_DIR && cp $DTBO $REPACK_DIR
+		cp $KERNEL $REPACK_DIR && cp $DTBO $REPACK_DIR && cp $DTB $REPACK_DIR
 }
 function make_zip {
 		cd $REPACK_DIR
@@ -101,7 +99,7 @@ function upload()
 {
 curl bashupload.com -T $ZIP_NAME*.zip
 ziped=$ZIP_MOVE/`echo $ZIP_NAME`.zip
-sed -i "4i\FILE_PATH=$ziped" $HOME/bool/upl.sh
+sed -i "4i\FILE_PATH=$ziped" $PWD/upl.sh
 BUILDDATE=`date +"%Y-%m-%d"`
 sed -i '5i\CAPTION="Build Date: '$BUILDDATE' | Type: KSU, AOSP"' $HOME/bool/upl.sh
 }

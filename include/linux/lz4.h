@@ -321,6 +321,8 @@ int LZ4_decompress_safe(const char *source, char *dest, int compressedSize,
 int LZ4_decompress_safe_partial(const char *source, char *dest,
 	int compressedSize, int targetOutputSize, int maxDecompressedSize);
 
+#endif
+
 /*-************************************************************************
  *	LZ4 HC Compression
  **************************************************************************/

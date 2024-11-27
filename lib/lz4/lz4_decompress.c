@@ -174,10 +174,8 @@ static FORCE_INLINE int __LZ4_decompress_generic(
 	 const size_t dictSize
 	 )
 {
-	const BYTE *ip = (const BYTE *)src;
 	const BYTE *const iend = ip + srcSize;
 
-	BYTE *op = (BYTE *) dst;
 	BYTE *const oend = op + outputSize;
 	BYTE *cpy;
 
@@ -729,6 +727,7 @@ int LZ4_decompress_safe_partial(const char *src, char *dst,
 				      endOnInputSize, partial_decode,
 				      noDict, (BYTE *)dst, NULL, 0);
 }
+#endif
 
 int LZ4_decompress_fast(const char *source, char *dest, int originalSize)
 {

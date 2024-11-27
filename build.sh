@@ -31,14 +31,9 @@ cpus=`expr $(nproc --all)`
 objdir="${kernel_dir}/out"
 CONFIGS="alioth_defconfig"
 
-VER="V1-RKbase-AOSP"
 KERNEL_DIR=`pwd`
 REPACK_DIR=$HOME/AnyKernel3alioth
 ZIP_MOVE=$HOME/Boolx
-BASE_AK_VER="Bool-X-Alioth-"
-DATE=`date +"%Y%m%d-%H%M"`
-AK_VER="$BASE_AK_VER$VER"
-ZIP_NAME="$AK_VER"-"$DATE"
 TOOLCHAINS=$HOME/toolchains/boolx-clang
 CONFIG=out/.config
 KERNEL=out/arch/arm64/boot/Image.gz
@@ -93,6 +88,11 @@ function make_zip {
 		zip -r9 `echo $ZIP_NAME`.zip *
 		mv  `echo $ZIP_NAME`*.zip $ZIP_MOVE
 		cd $KERNEL_DIR
+}
+
+function restore_miui {
+		cd $KERNEL_DIR
+                git restore arch/arm64/boot/dts/vendor/qcom/dsi-panel-k11a-38-08-0a-dsc-cmd.dtsi
 }
 
 function upload()
@@ -161,6 +161,35 @@ else
    create_out
    echo -e "${restore}"
 fi
+echo -e "${green}"
+echo "------------------"
+echo "CHOOSE VARIANT:"
+echo "------------------"
+while read -p "Do you want build MIUI or AOSP? (MIUI/AOSP): " variant
+do
+case "$variant" in
+        MIUI )
+            echo -e "${red}"
+                sed -i 's/qcom,mdss-pan-physical-width-dimension = <70>;$/qcom,mdss-pan-physical-width-dimension = <700>;/' arch/arm64/boot/dts/vendor/qcom/dsi-panel-k11a-38-08-0a-dsc-cmd.dtsi
+    		sed -i 's/qcom,mdss-pan-physical-height-dimension = <155>;$/qcom,mdss-pan-physical-height-dimension = <1540>;/' arch/arm64/boot/dts/vendor/qcom/dsi-panel-k11a-38-08-0a-dsc-cmd.dtsi
+                break
+                ;;
+        AOSP )
+                restore_miui
+                break
+                ;;
+        * )
+                echo -e "${red}"
+                echo "Invalid try again!"
+                echo -e "${restore}"
+                ;;
+esac
+done
+
+BASE_AK_VER="Bool-X-Alioth-V1-RKbase-"
+DATE=`date +"%Y%m%d-%H%M"`
+AK_VER="$BASE_AK_VER$variant"
+ZIP_NAME="$AK_VER"-"$DATE"
 
 echo -e "${green}"
 echo "------------------"
@@ -270,6 +299,7 @@ if [ -f $KERNEL ]; then
    echo -e "${restore}"
    build_time
    upload
+   restore_miui
    echo
 else
    echo -e "${red}"
@@ -278,6 +308,7 @@ else
    echo "-------------------------------------"
    echo -e "${restore}"
    build_time
+   restore_miui
 fi
 
 echo

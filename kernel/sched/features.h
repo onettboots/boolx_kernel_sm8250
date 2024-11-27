@@ -30,27 +30,27 @@
  * Consider buddies to be cache hot, decreases the likelyness of a
  * cache buddy being migrated away, increases cache locality.
  */
-SCHED_FEAT(CACHE_HOT_BUDDY, true)
+#define SCHED_FEAT_CACHE_HOT_BUDDY 1
 
 /*
  * Allow wakeup-time preemption of the current task:
  */
 #define SCHED_FEAT_WAKEUP_PREEMPTION 1
 
-SCHED_FEAT(HRTICK, false)
-SCHED_FEAT(DOUBLE_TICK, false)
-SCHED_FEAT(LB_BIAS, false)
+#define SCHED_FEAT_HRTICK 0
+#define SCHED_FEAT_DOUBLE_TICK 0
+#define SCHED_FEAT_LB_BIAS 0
 
 /*
  * Decrement CPU capacity based on time not spent running tasks
  */
-SCHED_FEAT(NONTASK_CAPACITY, true)
+#define SCHED_FEAT_NONTASK_CAPACITY 1
 
 /*
  * Queue remote wakeups on the target CPU and process them
  * using the scheduler IPI. Reduces rq->lock contention/bounces.
  */
-SCHED_FEAT(TTWU_QUEUE, false)
+#define SCHED_FEAT_TTWU_QUEUE 0
 
 /*
  * When doing wakeups, attempt to limit superfluous scans of the LLC domain.
@@ -122,11 +122,11 @@ SCHED_FEAT(TTWU_QUEUE, false)
  * If disabled, this behaviour will only apply to tasks of the
  * RT class.
  */
-SCHED_FEAT(SCHEDTUNE_BOOST_HOLD_ALL, false)
+#define SCHED_FEAT_SCHEDTUNE_BOOST_HOLD_ALL 0
 
 /*
  * Inflate the effective utilization of SchedTune-boosted tasks, which
  * generally leads to usage of higher frequencies.
  * If disabled, boosts will only bias tasks to higher-capacity CPUs.
  */
-SCHED_FEAT(SCHEDTUNE_BOOST_UTIL, false)
+#define SCHED_FEAT_SCHEDTUNE_BOOST_UTIL 0

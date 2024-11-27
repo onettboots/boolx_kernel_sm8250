@@ -164,7 +164,7 @@ static FORCE_INLINE int __LZ4_decompress_generic(
 	 endCondition_directive endOnInput,
 	 /* full, partial */
 	 earlyEnd_directive partialDecoding,
-	 /* noDict, withPrefix64k, usingExtDict */
+	 /* noDict, withPrefix64k */
 	 dict_directive dict,
 	 /* always <= dst, == dst when no prefix */
 	 const BYTE * const lowPrefix,
@@ -174,12 +174,11 @@ static FORCE_INLINE int __LZ4_decompress_generic(
 	 const size_t dictSize
 	 )
 {
-	const BYTE *const iend = ip + srcSize;
+	const BYTE * const iend = src + srcSize;
 
-	BYTE *const oend = op + outputSize;
+	BYTE * const oend = dst + outputSize;
 	BYTE *cpy;
 
-	const BYTE * const dictEnd = (const BYTE *)dictStart + dictSize;
 	const int safeDecode = (endOnInput == endOnInputSize);
 	const int checkOffset = ((safeDecode) && (dictSize < (int)(64 * KB)));
 
@@ -559,6 +558,7 @@ _copy_match:
 safe_match_copy:
 #endif
 
+#if 0
 		/* match starting within external dictionary */
 		if ((dict == usingExtDict) && (match < lowPrefix)) {
 			if (unlikely(op + length > oend - LASTLITERALS)) {
@@ -600,6 +600,7 @@ safe_match_copy:
 			}
 			continue;
 		}
+#endif
 
 		/* copy match within block */
 		cpy = op + length;
@@ -737,6 +738,7 @@ int LZ4_decompress_fast(const char *source, char *dest, int originalSize)
 				      (BYTE *)dest - 64 * KB, NULL, 0);
 }
 
+#if 0
 /* ===== Instantiate a few more decoding cases, used more than once. ===== */
 
 static int LZ4_decompress_safe_withPrefix64k(const char *source, char *dest,
@@ -849,11 +851,11 @@ static int LZ4_decompress_safe_continue(LZ4_streamDecode_t *LZ4_streamDecode,
 		/* The first call, no dictionary yet. */
 		assert(lz4sd->extDictSize == 0);
 #if defined(CONFIG_ARM64) && defined(CONFIG_KERNEL_MODE_NEON)
-		result = LZ4_arm64_decompress_safe(source, dest, 
-			compressedSize, maxOutputSize, false);
+		result = LZ4_arm64_decompress_safe(source, dest, compressedSize,
+						   maxOutputSize, false);
 #else
-		result = LZ4_decompress_safe(source, dest,
-			compressedSize, maxOutputSize);
+		result = LZ4_decompress_safe(source, dest, compressedSize,
+					     maxOutputSize);
 #endif
 		if (result <= 0)
 			return result;
@@ -963,6 +965,7 @@ static int LZ4_decompress_fast_usingDict(const char *source, char *dest,
 	return LZ4_decompress_fast_extDict(source, dest, originalSize,
 		dictStart, dictSize);
 }
+#endif
 
 ssize_t LZ4_arm64_decompress_safe_partial(const void *source,
 			      void *dest,
@@ -1017,6 +1020,9 @@ ssize_t LZ4_arm64_decompress_safe(const void *source,
 }
 
 #ifndef STATIC
+EXPORT_SYMBOL(LZ4_arm64_decompress_safe);
+EXPORT_SYMBOL(LZ4_arm64_decompress_safe_partial);
+
 MODULE_LICENSE("Dual BSD/GPL");
 MODULE_DESCRIPTION("LZ4 decompressor");
 #endif
